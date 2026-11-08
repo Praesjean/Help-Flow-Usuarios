@@ -25,10 +25,10 @@ O microserviço utiliza os princípios de Clean Architecture e Vertical Slice Ar
 
 A aplicação está organizada em quatro camadas:
 
-- API: controllers, rotas HTTP, autenticação e autorização.
-- Application: casos de uso responsáveis pelas operações do sistema.
-- Domain: regras de negócio e validações da entidade Usuario.
-- Infrastructure: conexão com Azure SQL e implementação do repositório.
+- **API:** controllers, rotas HTTP, autenticação e autorização.
+- **Application:** casos de uso responsáveis pelas operações do sistema.
+- **Domain:** regras de negócio e validações da entidade Usuario.
+- **Infrastructure:** conexão com Azure SQL e implementação do repositório.
 
 ### Estrutura de diretórios
 
@@ -91,25 +91,25 @@ Essa organização facilita a separação das responsabilidades e a manutenção
 
 O microserviço utiliza Azure SQL Database para armazenar os usuários.
 
-A conexão é implementada utilizando a biblioteca mssql.
+A conexão é implementada utilizando a biblioteca `mssql`.
 
 Os principais atributos utilizados são:
 
-| Campo | Descrição |
-|---|---|
-| id | Identificador do usuário |
-| nome | Nome do usuário |
-| email | E-mail utilizado no login |
-| senhaHash | Hash da senha |
-| perfil | Perfil de acesso |
-| ativo | Situação do usuário |
+| Campo     | Descrição                 |
+| --------- | ------------------------- |
+| id        | Identificador do usuário  |
+| nome      | Nome do usuário           |
+| email     | E-mail utilizado no login |
+| senhaHash | Hash da senha             |
+| perfil    | Perfil de acesso          |
+| ativo     | Situação do usuário       |
 
 ### Database per Service
 
-O Help Flow utiliza bancos independentes para seus microserviços.
+O Help Flow utiliza bancos independentes para seus microserviços:
 
-- Microserviço de Usuários: Azure SQL.
-- Microserviço de Chamados: MongoDB Atlas.
+- **Microserviço de Usuários:** Azure SQL Database.
+- **Microserviço de Chamados:** MongoDB Atlas.
 
 Essa separação evita o compartilhamento direto de tabelas ou coleções entre serviços.
 
@@ -143,13 +143,13 @@ O sistema utiliza três perfis:
 
 ### Regras de acesso
 
-| Operação | ADMIN | ATENDENTE | CLIENTE |
-|---|---|---|---|
-| Criar usuário via /api/usuarios | Sim | Não | Não |
-| Listar usuários | Sim | Sim | Não |
-| Consultar usuário por ID | Sim | Sim | Apenas o próprio |
-| Atualizar usuário | Sim | Não | Não |
-| Excluir usuário | Sim | Não | Não |
+| Operação                        | ADMIN | ATENDENTE | CLIENTE          |
+| ------------------------------- | ----- | --------- | ---------------- |
+| Criar usuário via /api/usuarios | Sim   | Não       | Não              |
+| Listar usuários                 | Sim   | Sim       | Não              |
+| Consultar usuário por ID        | Sim   | Sim       | Apenas o próprio |
+| Atualizar usuário               | Sim   | Não       | Não              |
+| Excluir usuário                 | Sim   | Não       | Não              |
 
 O cadastro público é disponibilizado separadamente pelo endpoint `/api/auth/register`.
 
@@ -157,20 +157,20 @@ O cadastro público é disponibilizado separadamente pelo endpoint `/api/auth/re
 
 ### Autenticação
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | /api/auth/login | Autenticar usuário |
-| POST | /api/auth/register | Registrar usuário |
+| Método | Endpoint           | Descrição          |
+| ------ | ------------------ | ------------------ |
+| POST   | /api/auth/login    | Autenticar usuário |
+| POST   | /api/auth/register | Registrar usuário  |
 
 ### Usuários
 
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | /api/usuarios | Listar usuários |
-| GET | /api/usuarios/:id | Consultar usuário |
-| POST | /api/usuarios | Criar usuário |
-| PUT | /api/usuarios/:id | Atualizar usuário |
-| DELETE | /api/usuarios/:id | Excluir usuário |
+| Método | Endpoint          | Descrição         |
+| ------ | ----------------- | ----------------- |
+| GET    | /api/usuarios     | Listar usuários   |
+| GET    | /api/usuarios/:id | Consultar usuário |
+| POST   | /api/usuarios     | Criar usuário     |
+| PUT    | /api/usuarios/:id | Atualizar usuário |
+| DELETE | /api/usuarios/:id | Excluir usuário   |
 
 As rotas de usuários exigem autenticação JWT e respeitam as permissões de cada perfil.
 
@@ -211,7 +211,7 @@ Resposta bem-sucedida, em formato simplificado:
 - Credenciais de conexão com o banco
 - Segredo JWT
 
-Instalar as dependências:
+Instale as dependências:
 
 ```bash
 npm install
@@ -241,11 +241,12 @@ Porta utilizada no ambiente local:
 
 `3002`
 
-Endpoint de verificação:
+### Endereços locais
 
-```text
-http://localhost:3002/health
-```
+| Recurso      | Endereço                     |
+| ------------ | ---------------------------- |
+| API          | http://localhost:3002        |
+| Health Check | http://localhost:3002/health |
 
 No Windows PowerShell, caso a execução de scripts esteja bloqueada, utilize `npm.cmd` em vez de `npm`.
 
@@ -285,7 +286,7 @@ Os testes de arquitetura verificam a existência das camadas, a organização po
 
 O projeto possui um Dockerfile para criação de uma imagem de contêiner.
 
-Criar a imagem local:
+### Construir a imagem
 
 ```bash
 docker build -t help-flow-usuarios .
@@ -295,7 +296,13 @@ A execução do contêiner exige a configuração das variáveis de ambiente nec
 
 Credenciais e segredos não devem ser incluídos diretamente na imagem Docker.
 
-## 11. Integração com o Help Flow
+## 11. Documentação Swagger
+
+O projeto possui configuração Swagger UI para documentação e consulta dos endpoints REST.
+
+A documentação permite visualizar as operações disponíveis e consultar os parâmetros das requisições.
+
+## 12. Integração com o Help Flow
 
 O microserviço de Usuários faz parte da arquitetura distribuída do Help Flow.
 
@@ -320,10 +327,6 @@ Azure SQL Database
 O BFF intermedeia as requisições do frontend e também pode consultar diferentes microserviços para agregar informações.
 
 O microserviço de Usuários é responsável pelo gerenciamento das contas e pela emissão dos tokens JWT utilizados na autenticação.
-
-## 12. Documentação Swagger
-
-O projeto possui configuração Swagger UI para documentação e consulta dos endpoints REST.
 
 ## 13. Contexto acadêmico
 
